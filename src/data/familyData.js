@@ -106,7 +106,7 @@ const familyData = [
     bio: 'A loving aunt known for her kindness and creative spirit.',
   },
 
-  // ================= GENERATION 4 =================
+  // ================= GENERATION 4 ==============
   {
     id: 'g4_albin',
     name: 'Albin John',
@@ -193,15 +193,15 @@ export const getCouples = (generationNumber) => {
   const membersInGen = familyData.filter(
     (m) => m.generation === generationNumber
   );
-  
+
   const couples = [];
   const visited = new Set();
-  
+
   membersInGen.forEach((member) => {
     if (visited.has(member.id)) return;
-    
+
     visited.add(member.id);
-    
+
     if (member.spouseId) {
       const spouse = membersInGen.find((m) => m.id === member.spouseId);
       if (spouse) {
@@ -220,7 +220,7 @@ export const getCouples = (generationNumber) => {
       couples.push([member]);
     }
   });
-  
+
   return couples;
 };
 
@@ -228,8 +228,8 @@ export const getCouples = (generationNumber) => {
 export const searchMembers = (query) => {
   if (!query) return [];
   const lowerQuery = query.toLowerCase();
-  return familyData.filter(member => 
-    member.name.toLowerCase().includes(lowerQuery) || 
+  return familyData.filter(member =>
+    member.name.toLowerCase().includes(lowerQuery) ||
     member.role.toLowerCase().includes(lowerQuery) ||
     (member.bio && member.bio.toLowerCase().includes(lowerQuery))
   );
