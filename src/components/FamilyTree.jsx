@@ -420,12 +420,7 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear }) {
         onClose={() => setDrawerOpen(false)}
       />
 
-      {/* Decorative Divider */}
-      <div className="relative mt-20 md:mt-28 flex flex-col items-center justify-center pointer-events-none">
-        <div className="w-px h-24 bg-gradient-to-b from-lime-400/50 to-transparent"></div>
-        <div className="w-3 h-3 border-2 border-lime-400 rounded-full mt-2 shadow-[0_0_15px_rgba(163,230,53,0.5)]"></div>
-        <div className="w-px h-16 bg-gradient-to-t from-lime-400/30 to-transparent mt-2"></div>
-      </div>
+
     </section>
   );
 }
