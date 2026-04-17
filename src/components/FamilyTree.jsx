@@ -227,7 +227,7 @@ function GenerationRow({ generation, couples, selectedId, onSelect, registerPosi
       </motion.div>
 
       {/* Members — always centered */}
-      <div className="flex flex-wrap items-start justify-center gap-8 sm:gap-12 md:gap-16 w-full">
+      <div className="flex flex-nowrap items-start justify-center gap-8 sm:gap-12 md:gap-16 w-full">
         {couples.map((couple, ci) => (
           <div key={ci} className="flex items-start gap-4 sm:gap-8 md:gap-10 relative isolate">
             {/* Horizontal Spouse Line */}
