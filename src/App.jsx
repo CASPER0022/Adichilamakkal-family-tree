@@ -8,6 +8,7 @@ import About from './components/About';
 import Footer from './components/Footer';
 import SearchModal from './components/SearchModal';
 import OurHomeDetail from './pages/OurHomeDetail';
+import FullFamilyTree from './pages/FullFamilyTree';
 
 export default function App() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -67,6 +68,7 @@ export default function App() {
           </main>
         } />
         <Route path="/our-home" element={<OurHomeDetail />} />
+        <Route path="/full-tree" element={<FullFamilyTree />} />
       </Routes>
 
       <Footer />

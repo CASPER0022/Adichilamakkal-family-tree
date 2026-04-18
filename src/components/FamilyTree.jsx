@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { Link } from 'react-router-dom';
 import familyData, { getCouples, generationLabels, getGenerations } from '../data/familyData';
 import MemberCard from './MemberCard';
 import ProfileDrawer from './ProfileDrawer';
@@ -59,9 +61,18 @@ function ConnectionLines({ positions, familyData: data }) {
 
     if (childPositions.length === 0) return;
 
+    const parentMember = data.find(m => m.id === group.parentId);
+    const isExtendedLine = parentMember?.isExtended;
+    const lineColor = isExtendedLine ? "#a855f7" : "#a3e635";
+
     // Find the horizontal bar Y position (midway between parent bottom and first child top)
     const firstChildTop = Math.min(...childPositions.map((p) => p.top));
-    const barY = dropY + (firstChildTop - dropY) * 0.5;
+    let barY = dropY + (firstChildTop - dropY) * 0.5;
+
+    // Offset the horizontal bar for extended family lineages to prevent overlapping
+    if (isExtendedLine) {
+      barY += 16;
+    }
 
     // 1. Vertical line: from parent couple center DOWN to the horizontal bar
     elements.push(
@@ -71,7 +82,7 @@ function ConnectionLines({ positions, familyData: data }) {
         y1={dropY + 4}
         x2={dropX}
         y2={barY}
-        stroke="#a3e635"
+        stroke={lineColor}
         strokeOpacity="0.6"
         strokeWidth="2"
         strokeLinecap="round"
@@ -85,7 +96,7 @@ function ConnectionLines({ positions, familyData: data }) {
         cx={dropX}
         cy={barY}
         r="3"
-        fill="#a3e635"
+        fill={lineColor}
         opacity="0.7"
       />
     );
@@ -103,7 +114,7 @@ function ConnectionLines({ positions, familyData: data }) {
           y1={barY}
           x2={rightX}
           y2={barY}
-          stroke="#a3e635"
+          stroke={lineColor}
           strokeOpacity="0.6"
           strokeWidth="2"
           strokeLinecap="round"
@@ -120,7 +131,7 @@ function ConnectionLines({ positions, familyData: data }) {
           y1={barY}
           x2={childPos.cx}
           y2={childPos.top - 4}
-          stroke="#a3e635"
+          stroke={lineColor}
           strokeOpacity="0.6"
           strokeWidth="2"
           strokeLinecap="round"
@@ -134,7 +145,7 @@ function ConnectionLines({ positions, familyData: data }) {
           cx={childPos.cx}
           cy={childPos.top - 4}
           r="2.5"
-          fill="#a3e635"
+          fill={lineColor}
           opacity="0.6"
         />
       );
@@ -208,7 +219,7 @@ function ConnectionLines({ positions, familyData: data }) {
 }
 
 // ===== Generation Row =====
-function GenerationRow({ generation, couples, selectedId, onSelect, registerPosition }) {
+function GenerationRow({ generation, couples, selectedId, onSelect, registerPosition, isFullView }) {
   return (
     <div className="flex flex-col items-center gap-3 w-full">
       {/* Generation label */}
@@ -228,27 +239,58 @@ function GenerationRow({ generation, couples, selectedId, onSelect, registerPosi
 
       {/* Members — always centered */}
       <div className="flex flex-nowrap items-start justify-center gap-8 sm:gap-12 md:gap-16 w-full">
+        {/* Gen 4 Base Spacers: Balances Gen 3's extreme left Shaji/Reji/Saju to align Albin smoothly under Raju */}
+        {isFullView && generation === 4 && (
+          Array.from({ length: 3 }).map((_, i) => (
+             <div key={`spacer-gen4-prefix-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
+          ))
+        )}
+        
         {couples.map((couple, ci) => (
-          <div key={ci} className="flex items-start gap-4 sm:gap-8 md:gap-10 relative isolate">
-            {/* Horizontal Spouse Line */}
-            {couple.length === 2 && (
-              <div className="absolute top-[35px] sm:top-[45px] left-1/2 -translate-x-1/2 w-8 sm:w-16 h-px border-b-2 border-dashed border-gray-600/50 -z-10" />
+          <div key={ci} style={{ display: 'contents' }}>
+            
+            {/* Gen 2 Spacers: Decouple George and John so they perfectly branch over their distinct lineages directly */}
+            {isFullView && generation === 2 && ci === 1 && (
+               Array.from({ length: 4 }).map((_, i) => (
+                 <div key={`spacer-gen2-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
+               ))
             )}
-            {couple.map((member, mi) => (
-              <div
-                key={member.id}
-                ref={(el) => {
-                  if (el) registerPosition(member.id, el);
-                }}
-              >
-                <MemberCard
-                  member={member}
-                  index={ci * 2 + mi}
-                  isSelected={selectedId === member.id}
-                  onClick={() => onSelect(member)}
-                />
-              </div>
-            ))}
+
+            {/* Gen 3 Spacers: Shift Sigi/Raju right by 1 to align over their 4 wide children, instead of being left-anchored */}
+            {isFullView && generation === 3 && ci === 3 && (
+               Array.from({ length: 1 }).map((_, i) => (
+                 <div key={`spacer-gen3-sigi-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
+               ))
+            )}
+
+            {/* Gen 3 Spacers: Absorb Raju's massive 4-card child width so Babu isn't artificially squeezed left! */}
+            {isFullView && generation === 3 && ci === 4 && (
+               Array.from({ length: 2 }).map((_, i) => (
+                 <div key={`spacer-gen3-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
+               ))
+            )}
+
+            <div className="flex items-start gap-4 sm:gap-8 md:gap-10 relative isolate">
+              {/* Horizontal Spouse Line */}
+              {couple.length === 2 && (
+                <div className="absolute top-[35px] sm:top-[45px] left-1/2 -translate-x-1/2 w-8 sm:w-16 h-px border-b-2 border-dashed border-gray-600/50 -z-10" />
+              )}
+              {couple.map((member, mi) => (
+                <div
+                  key={member.id}
+                  ref={(el) => {
+                    if (el) registerPosition(member.id, el);
+                  }}
+                >
+                  <MemberCard
+                    member={member}
+                    index={ci * 2 + mi}
+                    isSelected={selectedId === member.id}
+                    onClick={() => onSelect(member)}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
@@ -258,7 +300,7 @@ function GenerationRow({ generation, couples, selectedId, onSelect, registerPosi
 
 
 // ===== Main FamilyTree Component =====
-export default function FamilyTree({ highlightMemberId, onHighlightClear }) {
+export default function FamilyTree({ highlightMemberId, onHighlightClear, isFullView = false }) {
   const [selectedMember, setSelectedMember] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [positions, setPositions] = useState({});
@@ -266,15 +308,17 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear }) {
   const containerRef = useRef(null);
   const positionRefs = useRef({});
 
-  const generations = getGenerations();
+  const displayData = useMemo(() => isFullView ? familyData : familyData.filter(m => !m.isExtended), [isFullView]);
+
+  const generations = useMemo(() => getGenerations(displayData), [displayData]);
 
   const generationCouples = useMemo(() => {
     const result = {};
     generations.forEach((gen) => {
-      result[gen] = getCouples(gen);
+      result[gen] = getCouples(gen, displayData);
     });
     return result;
-  }, []);
+  }, [generations, displayData]);
 
   const registerPosition = useCallback((id, el) => {
     positionRefs.current[id] = el;
@@ -284,19 +328,28 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear }) {
     const container = containerRef.current;
     if (!container) return;
     const containerRect = container.getBoundingClientRect();
+    
+    // Compute exact active scale factor applied by any parent CSS transforms
+    let activeScale = containerRect.width / container.offsetWidth;
+    if (!activeScale || !isFinite(activeScale) || activeScale <= 0.0001) {
+      activeScale = 1;
+    }
 
     const newPositions = {};
     Object.entries(positionRefs.current).forEach(([id, el]) => {
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      newPositions[id] = {
-        cx: rect.left + rect.width / 2 - containerRect.left,
-        cy: rect.top + rect.height / 2 - containerRect.top,
-        top: rect.top - containerRect.top,
-        bottom: rect.bottom - containerRect.top,
-        left: rect.left - containerRect.left,
-        right: rect.right - containerRect.left,
-      };
+      
+      const cx = (rect.left + rect.width / 2 - containerRect.left) / activeScale;
+      const cy = (rect.top + rect.height / 2 - containerRect.top) / activeScale;
+      const top = (rect.top - containerRect.top) / activeScale;
+      const bottom = (rect.bottom - containerRect.top) / activeScale;
+      const left = (rect.left - containerRect.left) / activeScale;
+      const right = (rect.right - containerRect.left) / activeScale;
+
+      if (!isFinite(cx) || !isFinite(cy) || !isFinite(top) || !isFinite(bottom)) return;
+
+      newPositions[id] = { cx, cy, top, bottom, left, right };
     });
     setPositions(newPositions);
   }, []);
@@ -339,9 +392,10 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear }) {
     : generations;
 
   return (
-    <section id="tree" className="relative pt-24 sm:pt-40 pb-10 sm:pb-16 px-3 sm:px-6">
+    <section id="tree" className={`relative pb-10 sm:pb-16 px-3 sm:px-6 ${isFullView ? 'pt-0' : 'pt-24 sm:pt-40'}`}>
       {/* Section Header */}
-      <div className="w-full mb-8 sm:mb-12">
+      {!isFullView && (
+        <div className="w-full mb-8 sm:mb-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -384,34 +438,94 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear }) {
           ))}
         </div>
       </div>
+      )}
 
-      {/* Tree Visualization — Responsive & Scrollable */}
-      <div 
-        className="w-full overflow-x-auto overflow-y-hidden pb-10 hide-scrollbar scroll-smooth"
-        style={{ WebkitOverflowScrolling: 'touch' }}
+      {/* Tree Visualization */}
+      <div className={`w-full pb-10 select-none ${isFullView ? 'overflow-hidden h-[calc(100vh-100px)]' : 'overflow-x-auto overflow-y-hidden'}`}
+           style={!isFullView ? { WebkitOverflowScrolling: 'touch' } : {}}
       >
-        <div
-          ref={containerRef}
-          className="relative flex flex-col items-center gap-10 sm:gap-14 md:gap-16 py-4 sm:py-6 px-4 md:px-12 min-w-fit mx-auto"
-        >
-          {/* Connection Lines */}
-          {!activeGen && (
-            <ConnectionLines positions={positions} familyData={familyData} />
-          )}
+        {isFullView ? (
+          <TransformWrapper
+            initialScale={0.35}
+            minScale={0.1}
+            maxScale={2}
+            centerOnInit={true}
+            wheel={{ step: 0.015 }}
+            pinch={{ step: 2 }}
+            panning={{ velocityDisabled: true }}
+          >
+            <TransformComponent wrapperClass="!w-full !h-full" contentClass="!min-w-fit align-top">
+              <div
+                ref={containerRef}
+                className="relative flex flex-col items-center gap-10 sm:gap-14 md:gap-16 py-4 sm:py-6 px-4 md:px-12 mx-auto"
+              >
+                {/* Connection Lines */}
+                {!activeGen && (
+                  <ConnectionLines positions={positions} familyData={displayData} />
+                )}
 
-          {/* Generation Rows */}
-          {filteredGenerations.map((gen) => (
-            <GenerationRow
-              key={gen}
-              generation={gen}
-              couples={generationCouples[gen]}
-              selectedId={selectedMember?.id}
-              onSelect={handleSelect}
-              registerPosition={registerPosition}
-            />
-          ))}
-        </div>
+                {/* Generation Rows */}
+                {filteredGenerations.map((gen) => (
+                  <GenerationRow
+                    key={gen}
+                    generation={gen}
+                    couples={generationCouples[gen]}
+                    selectedId={selectedMember?.id}
+                    onSelect={handleSelect}
+                    registerPosition={registerPosition}
+                    isFullView={isFullView}
+                  />
+                ))}
+              </div>
+            </TransformComponent>
+          </TransformWrapper>
+        ) : (
+          <div
+            ref={containerRef}
+            className="relative flex flex-col items-center gap-10 sm:gap-14 md:gap-16 py-4 sm:py-6 px-4 md:px-12 mx-auto min-w-fit"
+          >
+            {/* Connection Lines */}
+            {!activeGen && (
+              <ConnectionLines positions={positions} familyData={displayData} />
+            )}
+
+            {/* Generation Rows */}
+            {filteredGenerations.map((gen) => (
+              <GenerationRow
+                key={gen}
+                generation={gen}
+                couples={generationCouples[gen]}
+                selectedId={selectedMember?.id}
+                onSelect={handleSelect}
+                registerPosition={registerPosition}
+                isFullView={isFullView}
+              />
+            ))}
+          </div>
+        )}
       </div>
+
+      {!isFullView && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-8 mb-4 flex justify-center w-full"
+        >
+          <Link 
+            to="/full-tree" 
+            className="inline-flex items-center gap-2 px-6 py-3 bg-lime-400/10 hover:bg-lime-400/20 text-lime-400 border border-lime-400/30 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(163,230,53,0.3)] font-medium text-sm cursor-pointer"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 3h6v6"></path>
+              <path d="M9 21H3v-6"></path>
+              <path d="M21 3l-7 7"></path>
+              <path d="M3 21l7-7"></path>
+            </svg>
+            <span>View Full Family Tree</span>
+          </Link>
+        </motion.div>
+      )}
 
       {/* Profile Drawer */}
       <ProfileDrawer

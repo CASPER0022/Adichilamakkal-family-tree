@@ -67,21 +67,13 @@ export default function About() {
           </div>
           <div className="space-y-6 sm:space-y-8 text-sm sm:text-base text-gray-400 leading-relaxed sm:leading-loose">
             <p>
-              The Adichilamakkal family story begins in the late 1800s, when John, a man 
-              with strong values and an incredible work ethic, married Rosamma. Their bond 
-              became the cornerstone of a legacy that would span over a century.
+              The Adichilamakkal family story begins in the late 1900s,
             </p>
             <p>
-              Through times of immense change, the family only grew stronger 
-              with each passing generation. Under the loving guidance of John Ulahannan 
-              and Annamma, the family expanded, always staying true to the traditions, 
-              dedication, and dreams of those who came before them.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum, quas cum ipsa nam iusto quod enim explicabo blanditiis sed dolores vero eius odio aut quasi voluptas ex veniam et delectus!
             </p>
             <p>
-              Today, the newest generations carry forward this rich heritage while forging their own 
-              paths into the future. The family tree continues to grow, 
-              branching out in exciting new directions while remaining deeply rooted in the love and 
-              faith that have always defined the Adichilamakkal name.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel ipsum excepturi nesciunt commodi similique iste iure quidem, explicabo non temporibus dolores consectetur veritatis. Porro et placeat reprehenderit ad ex molestiae.
             </p>
           </div>
         </motion.div>

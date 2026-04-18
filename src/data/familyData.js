@@ -30,6 +30,32 @@ const familyData = [
 
   // ================= GENERATION 2 =================
   {
+    id: 'g2_george',
+    name: 'George',
+    role: 'Maternal Grandfather',
+    generation: 2,
+    gender: 'male',
+    birthYear: 1945,
+    deathYear: null,
+    avatar: getAvatar('George', 'male'),
+    bio: 'A loving grandfather and the pillar of Sigi\'s family.',
+    spouseId: 'g2_annakutty',
+    isExtended: true,
+  },
+  {
+    id: 'g2_annakutty',
+    name: 'Annakutty',
+    role: 'Maternal Grandmother',
+    generation: 2,
+    gender: 'female',
+    birthYear: 1950,
+    deathYear: null,
+    avatar: getAvatar('Annakutty', 'female'),
+    bio: 'A kind-hearted grandmother who instilled great values in Sigi and her siblings.',
+    spouseId: 'g2_george',
+    isExtended: true,
+  },
+  {
     id: 'g2_john',
     name: 'John Ulahannan',
     role: 'Grandfather',
@@ -57,6 +83,45 @@ const familyData = [
 
   // ================= GENERATION 3 =================
   {
+    id: 'g3_shaji_vj',
+    name: 'Shaji VJ',
+    role: 'Uncle',
+    generation: 3,
+    gender: 'male',
+    birthYear: 1968,
+    deathYear: null,
+    parentId: 'g2_george',
+    avatar: getAvatar('ShajiVJ', 'male'),
+    bio: 'Brother of Sigi.',
+    isExtended: true,
+  },
+  {
+    id: 'g3_reji_vj',
+    name: 'Reji VJ',
+    role: 'Uncle',
+    generation: 3,
+    gender: 'male',
+    birthYear: 1970,
+    deathYear: null,
+    parentId: 'g2_george',
+    avatar: getAvatar('RejiVJ', 'male'),
+    bio: 'Brother of Sigi.',
+    isExtended: true,
+  },
+  {
+    id: 'g3_saju_vj',
+    name: 'Saju VJ',
+    role: 'Uncle',
+    generation: 3,
+    gender: 'male',
+    birthYear: 1972,
+    deathYear: null,
+    parentId: 'g2_george',
+    avatar: getAvatar('SajuVJ', 'male'),
+    bio: 'Brother of Sigi.',
+    isExtended: true,
+  },
+  {
     id: 'g3_raju',
     name: 'Raju John',
     role: 'Father',
@@ -77,6 +142,7 @@ const familyData = [
     gender: 'female',
     birthYear: 1965,
     deathYear: null,
+    parentId: 'g2_george',
     avatar: '/images/family/sigi.jpeg',
     bio: 'The heart of the household, bringing joy, care, and compassion to everyone.',
     spouseId: 'g3_raju',
@@ -92,6 +158,20 @@ const familyData = [
     parentId: 'g2_john',
     avatar: getAvatar('BabuJohn', 'male'),
     bio: 'A person of great intellect and humor, always the life of the family gatherings.',
+    spouseId: 'g3_shiny',
+  },
+  {
+    id: 'g3_shiny',
+    name: 'Shiny Babu',
+    role: 'Aunt',
+    generation: 3,
+    gender: 'female',
+    birthYear: 1968,
+    deathYear: null,
+    avatar: getAvatar('ShinyBabu', 'female'),
+    bio: 'A wonderful wife and mother who brings warmth to the household.',
+    spouseId: 'g3_babu',
+    isExtended: true,
   },
   {
     id: 'g3_shija',
@@ -104,6 +184,20 @@ const familyData = [
     parentId: 'g2_john',
     avatar: getAvatar('Shija', 'female'),
     bio: 'A loving aunt known for her kindness and creative spirit.',
+    spouseId: 'g3_sunny',
+  },
+  {
+    id: 'g3_sunny',
+    name: 'Sunny',
+    role: 'Uncle',
+    generation: 3,
+    gender: 'male',
+    birthYear: 1962,
+    deathYear: null,
+    avatar: getAvatar('Sunny', 'male'),
+    bio: 'A hardworking and caring father who anchors his family with love.',
+    spouseId: 'g3_shija',
+    isExtended: true,
   },
 
   // ================= GENERATION 4 ==============
@@ -156,6 +250,58 @@ const familyData = [
     avatar: '/images/family/sebin.jpeg',
     bio: 'The energetic youngest son with a passion for creative arts and sports.',
   },
+  {
+    id: 'g4_soniya',
+    name: 'Soniya Babu',
+    role: 'Cousin',
+    generation: 4,
+    gender: 'female',
+    birthYear: 1990,
+    deathYear: null,
+    parentId: 'g3_babu',
+    avatar: getAvatar('Soniya', 'female'),
+    bio: 'Daughter of Babu and Shiny.',
+    isExtended: true,
+  },
+  {
+    id: 'g4_sophia',
+    name: 'Sophia Babu',
+    role: 'Cousin',
+    generation: 4,
+    gender: 'female',
+    birthYear: 1994,
+    deathYear: null,
+    parentId: 'g3_babu',
+    avatar: getAvatar('Sophia', 'female'),
+    bio: 'Daughter of Babu and Shiny.',
+    isExtended: true,
+  },
+  {
+    id: 'g4_sebin_sunny',
+    name: 'Sebin Sunny',
+    role: 'Cousin',
+    generation: 4,
+    gender: 'male',
+    birthYear: 1993,
+    deathYear: null,
+    parentId: 'g3_shija',
+    avatar: getAvatar('SebinSunny', 'male'),
+    bio: 'Son of Shija and Sunny.',
+    isExtended: true,
+  },
+  {
+    id: 'g4_sherin_sunny',
+    name: 'Sherin Sunny',
+    role: 'Cousin',
+    generation: 4,
+    gender: 'female',
+    birthYear: 1997,
+    deathYear: null,
+    parentId: 'g3_shija',
+    avatar: getAvatar('SherinSunny', 'female'),
+    bio: 'Daughter of Shija and Sunny.',
+    isExtended: true,
+  },
 
   // ================= GENERATION 5 =================
   {
@@ -175,8 +321,8 @@ const familyData = [
 export default familyData;
 
 // Group members by generation for rendering
-export const getGenerations = () => {
-  const gens = [...new Set(familyData.map((m) => m.generation))];
+export const getGenerations = (dataToUse = familyData) => {
+  const gens = [...new Set(dataToUse.map((m) => m.generation))];
   return gens.sort((a, b) => a - b);
 };
 
@@ -189,8 +335,8 @@ export const generationLabels = {
 };
 
 // Groups members into couples or individuals for a given generation
-export const getCouples = (generationNumber) => {
-  const membersInGen = familyData.filter(
+export const getCouples = (generationNumber, dataToUse = familyData) => {
+  const membersInGen = dataToUse.filter(
     (m) => m.generation === generationNumber
   );
 
@@ -208,6 +354,10 @@ export const getCouples = (generationNumber) => {
         visited.add(spouse.id);
         // Order: primary bloodline usually first, but we default to male first for layout symmetry if needed
         const coupleArr = [member, spouse].sort((a, b) => {
+          // Explicit override: Sigi must be on the left of Raju to prevent line crossover from George
+          if ((a.id === 'g3_sigi' && b.id === 'g3_raju') || (b.id === 'g3_sigi' && a.id === 'g3_raju')) {
+            return a.id === 'g3_sigi' ? -1 : 1;
+          }
           if (a.gender === 'male' && b.gender !== 'male') return -1;
           if (a.gender !== 'male' && b.gender === 'male') return 1;
           return 0;
