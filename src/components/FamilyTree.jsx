@@ -239,33 +239,19 @@ function GenerationRow({ generation, couples, selectedId, onSelect, registerPosi
 
       {/* Members — always centered */}
       <div className="flex flex-nowrap items-start justify-center gap-8 sm:gap-12 md:gap-16 w-full">
-        {/* Gen 4 Base Spacers: Balances Gen 3's extreme left Shaji/Reji/Saju to align Albin smoothly under Raju */}
+        {/* Gen 4 Base Spacers: Align Gen 4 directly under Sigi & Raju by balancing the width of Shaji, Reji, and Saju */}
         {isFullView && generation === 4 && (
-          Array.from({ length: 3 }).map((_, i) => (
+          Array.from({ length: 2 }).map((_, i) => (
              <div key={`spacer-gen4-prefix-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
           ))
         )}
         
         {couples.map((couple, ci) => (
           <div key={ci} style={{ display: 'contents' }}>
-            
-            {/* Gen 2 Spacers: Decouple George and John so they perfectly branch over their distinct lineages directly */}
-            {isFullView && generation === 2 && ci === 1 && (
-               Array.from({ length: 4 }).map((_, i) => (
-                 <div key={`spacer-gen2-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
-               ))
-            )}
 
-            {/* Gen 3 Spacers: Shift Sigi/Raju right by 1 to align over their 4 wide children, instead of being left-anchored */}
-            {isFullView && generation === 3 && ci === 3 && (
-               Array.from({ length: 1 }).map((_, i) => (
-                 <div key={`spacer-gen3-sigi-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
-               ))
-            )}
-
-            {/* Gen 3 Spacers: Absorb Raju's massive 4-card child width so Babu isn't artificially squeezed left! */}
+            {/* Gen 3 Spacers: Give exactly 1 structural block between Raju and Babu to allow Raju's 3 distinct children groups to vertically breathe */}
             {isFullView && generation === 3 && ci === 4 && (
-               Array.from({ length: 2 }).map((_, i) => (
+               Array.from({ length: 1 }).map((_, i) => (
                  <div key={`spacer-gen3-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
                ))
             )}
@@ -450,14 +436,15 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear, isFull
             minScale={0.1}
             maxScale={2}
             centerOnInit={true}
-            wheel={{ step: 0.015 }}
+            wheel={{ step: 0.005, smooth: false }}
             pinch={{ step: 2 }}
+            doubleClick={{ disabled: true }}
             panning={{ velocityDisabled: true }}
           >
-            <TransformComponent wrapperClass="!w-full !h-full" contentClass="!min-w-fit align-top">
+            <TransformComponent wrapperClass="!w-full !h-full pointer-events-none" contentClass="!min-w-fit align-top">
               <div
                 ref={containerRef}
-                className="relative flex flex-col items-center gap-10 sm:gap-14 md:gap-16 py-4 sm:py-6 px-4 md:px-12 mx-auto"
+                className="relative flex flex-col items-center gap-10 sm:gap-14 md:gap-16 py-8 sm:py-12 px-6 md:px-16 mx-auto pointer-events-auto cursor-grab active:cursor-grabbing pb-24 md:pb-32"
               >
                 {/* Connection Lines */}
                 {!activeGen && (
