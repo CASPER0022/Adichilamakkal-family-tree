@@ -219,7 +219,7 @@ function ConnectionLines({ positions, familyData: data }) {
 }
 
 // ===== Generation Row =====
-function GenerationRow({ generation, couples, selectedId, onSelect, registerPosition, isFullView }) {
+function GenerationRow({ generation, couples, parentCouples, allData, selectedId, onSelect, registerPosition, isFullView }) {
   return (
     <div className="flex flex-col items-center gap-3 w-full">
       {/* Generation label */}
@@ -239,46 +239,103 @@ function GenerationRow({ generation, couples, selectedId, onSelect, registerPosi
 
       {/* Members — always centered */}
       <div className="flex flex-nowrap items-start justify-center gap-8 sm:gap-12 md:gap-16 w-full">
-        {/* Gen 4 Base Spacers: Align Gen 4 directly under Sigi & Raju by balancing the width of Shaji, Reji, and Saju */}
-        {isFullView && generation === 4 && (
-          Array.from({ length: 2 }).map((_, i) => (
-             <div key={`spacer-gen4-prefix-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
+
+        {generation === 5 && parentCouples ? (
+          /* Mirror Gen 4: each parent couple becomes exactly one flex item of matching width */
+          parentCouples.map((parentCouple, pci) => {
+            const parentIds = parentCouple.map(m => m.id);
+            const childMembers = allData.filter(m =>
+              m.generation === 5 && parentIds.includes(m.parentId)
+            );
+            const isCoupleSlot = parentCouple.length === 2;
+
+            if (childMembers.length > 0) {
+              /* Slot WITH children */
+              if (isCoupleSlot) {
+                /* Couple-width wrapper: invisible padding cards force correct width, child centered between */
+                return (
+                  <div key={`gen5-slot-${pci}`} className="flex items-start gap-4 sm:gap-8 md:gap-10 justify-center relative">
+                    <div className="w-28 sm:w-36 md:w-40 flex-shrink-0 invisible" />
+                    {childMembers.map((child) => (
+                      <div
+                        key={child.id}
+                        ref={(el) => { if (el) registerPosition(child.id, el); }}
+                        className="absolute left-1/2 -translate-x-1/2 top-0"
+                      >
+                        <MemberCard
+                          member={child}
+                          index={pci}
+                          isSelected={selectedId === child.id}
+                          onClick={() => onSelect(child)}
+                        />
+                      </div>
+                    ))}
+                    <div className="w-28 sm:w-36 md:w-40 flex-shrink-0 invisible" />
+                  </div>
+                );
+              } else {
+                /* Single-width slot, just the child */
+                return childMembers.map((child) => (
+                  <div
+                    key={child.id}
+                    ref={(el) => { if (el) registerPosition(child.id, el); }}
+                  >
+                    <MemberCard
+                      member={child}
+                      index={pci}
+                      isSelected={selectedId === child.id}
+                      onClick={() => onSelect(child)}
+                    />
+                  </div>
+                ));
+              }
+            } else {
+              /* Empty slot — invisible placeholder matching parent width */
+              return (
+                <div key={`gen5-empty-${pci}`} className="flex items-start gap-4 sm:gap-8 md:gap-10 relative">
+                  {parentCouple.map(m => (
+                    <div key={`ph-${m.id}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 invisible" />
+                  ))}
+                </div>
+              );
+            }
+          })
+        ) : (
+          /* Standard rendering for all other generations */
+          couples.map((couple, ci) => (
+            <div key={ci} style={{ display: 'contents' }}>
+
+              {/* Gen 3 Spacers */}
+              {isFullView && generation === 3 && ci === 4 && (
+                Array.from({ length: 1 }).map((_, i) => (
+                  <div key={`spacer-gen3-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
+                ))
+              )}
+
+              <div className="flex items-start gap-4 sm:gap-8 md:gap-10 relative isolate">
+                {/* Horizontal Spouse Line */}
+                {couple.length === 2 && (
+                  <div className="absolute top-[35px] sm:top-[45px] left-1/2 -translate-x-1/2 w-8 sm:w-16 h-px border-b-2 border-dashed border-gray-600/50 -z-10" />
+                )}
+                {couple.map((member, mi) => (
+                  <div
+                    key={member.id}
+                    ref={(el) => {
+                      if (el) registerPosition(member.id, el);
+                    }}
+                  >
+                    <MemberCard
+                      member={member}
+                      index={ci * 2 + mi}
+                      isSelected={selectedId === member.id}
+                      onClick={() => onSelect(member)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           ))
         )}
-        
-        {couples.map((couple, ci) => (
-          <div key={ci} style={{ display: 'contents' }}>
-
-            {/* Gen 3 Spacers: Give exactly 1 structural block between Raju and Babu to allow Raju's 3 distinct children groups to vertically breathe */}
-            {isFullView && generation === 3 && ci === 4 && (
-               Array.from({ length: 1 }).map((_, i) => (
-                 <div key={`spacer-gen3-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
-               ))
-            )}
-
-            <div className="flex items-start gap-4 sm:gap-8 md:gap-10 relative isolate">
-              {/* Horizontal Spouse Line */}
-              {couple.length === 2 && (
-                <div className="absolute top-[35px] sm:top-[45px] left-1/2 -translate-x-1/2 w-8 sm:w-16 h-px border-b-2 border-dashed border-gray-600/50 -z-10" />
-              )}
-              {couple.map((member, mi) => (
-                <div
-                  key={member.id}
-                  ref={(el) => {
-                    if (el) registerPosition(member.id, el);
-                  }}
-                >
-                  <MemberCard
-                    member={member}
-                    index={ci * 2 + mi}
-                    isSelected={selectedId === member.id}
-                    onClick={() => onSelect(member)}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
@@ -314,7 +371,7 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear, isFull
     const container = containerRef.current;
     if (!container) return;
     const containerRect = container.getBoundingClientRect();
-    
+
     // Compute exact active scale factor applied by any parent CSS transforms
     let activeScale = containerRect.width / container.offsetWidth;
     if (!activeScale || !isFinite(activeScale) || activeScale <= 0.0001) {
@@ -325,7 +382,7 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear, isFull
     Object.entries(positionRefs.current).forEach(([id, el]) => {
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      
+
       const cx = (rect.left + rect.width / 2 - containerRect.left) / activeScale;
       const cy = (rect.top + rect.height / 2 - containerRect.top) / activeScale;
       const top = (rect.top - containerRect.top) / activeScale;
@@ -382,53 +439,51 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear, isFull
       {/* Section Header */}
       {!isFullView && (
         <div className="w-full mb-8 sm:mb-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-6"
-          style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-        >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-['Outfit'] font-bold text-white mb-3 text-center">
-            The Family <span className="gradient-text">Lineage</span>
-          </h2>
-          <p className="text-gray-500 text-sm sm:text-base max-w-md text-center">
-            Click on any member to explore their story
-          </p>
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-6"
+            style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+          >
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-['Outfit'] font-bold text-white mb-3 text-center">
+              The Family <span className="gradient-text">Lineage</span>
+            </h2>
+            <p className="text-gray-500 text-sm sm:text-base max-w-md text-center">
+              Click on any member to explore their story
+            </p>
+          </motion.div>
 
-        {/* Generation Filter */}
-        <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
-          <button
-            onClick={() => setActiveGen(null)}
-            className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-all cursor-pointer ${
-              !activeGen
+          {/* Generation Filter */}
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
+            <button
+              onClick={() => setActiveGen(null)}
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-all cursor-pointer ${!activeGen
                 ? 'bg-lime-400/15 text-lime-400 border border-lime-400/30'
                 : 'text-gray-500 hover:text-gray-300 border border-transparent hover:border-white/10'
-            }`}
-          >
-            All
-          </button>
-          {generations.map((gen) => (
-            <button
-              key={gen}
-              onClick={() => setActiveGen(activeGen === gen ? null : gen)}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-all cursor-pointer ${
-                activeGen === gen
+                }`}
+            >
+              All
+            </button>
+            {generations.map((gen) => (
+              <button
+                key={gen}
+                onClick={() => setActiveGen(activeGen === gen ? null : gen)}
+                className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-all cursor-pointer ${activeGen === gen
                   ? 'bg-lime-400/15 text-lime-400 border border-lime-400/30'
                   : 'text-gray-500 hover:text-gray-300 border border-transparent hover:border-white/10'
-              }`}
-            >
-              Gen {gen}
-            </button>
-          ))}
+                  }`}
+              >
+                Gen {gen}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
       )}
 
       {/* Tree Visualization */}
       <div className={`w-full pb-10 select-none ${isFullView ? 'overflow-hidden h-[calc(100vh-100px)]' : 'overflow-x-auto overflow-y-hidden'}`}
-           style={!isFullView ? { WebkitOverflowScrolling: 'touch' } : {}}
+        style={!isFullView ? { WebkitOverflowScrolling: 'touch' } : {}}
       >
         {isFullView ? (
           <TransformWrapper
@@ -457,6 +512,8 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear, isFull
                     key={gen}
                     generation={gen}
                     couples={generationCouples[gen]}
+                    parentCouples={gen > 1 ? generationCouples[gen - 1] : null}
+                    allData={displayData}
                     selectedId={selectedMember?.id}
                     onSelect={handleSelect}
                     registerPosition={registerPosition}
@@ -482,6 +539,8 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear, isFull
                 key={gen}
                 generation={gen}
                 couples={generationCouples[gen]}
+                parentCouples={gen > 1 ? generationCouples[gen - 1] : null}
+                allData={displayData}
                 selectedId={selectedMember?.id}
                 onSelect={handleSelect}
                 registerPosition={registerPosition}
@@ -493,14 +552,14 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear, isFull
       </div>
 
       {!isFullView && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="mt-8 mb-4 flex justify-center w-full"
         >
-          <Link 
-            to="/full-tree" 
+          <Link
+            to="/full-tree"
             className="inline-flex items-center gap-2 px-6 py-3 bg-lime-400/10 hover:bg-lime-400/20 text-lime-400 border border-lime-400/30 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(163,230,53,0.3)] font-medium text-sm cursor-pointer"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
