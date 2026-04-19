@@ -91,18 +91,6 @@ function ConnectionLines({ positions, familyData: data }) {
       />
     );
 
-    // Small dot at the junction point
-    elements.push(
-      <circle
-        key={`junction-${coupleKey}`}
-        cx={dropX}
-        cy={barY}
-        r="3"
-        fill={lineColor}
-        opacity="0.7"
-      />
-    );
-
     // If single child, enforce a perfectly straight vertical line ONLY if they are reasonably close (ignoring sub-pixel shifts)
     // If they are physically far away due to flex layouts (like Gen 4), we MUST allow the horizontal connector to span the distance!
     const activeChildPositions = childPositions.map(p => {
@@ -119,6 +107,18 @@ function ConnectionLines({ positions, familyData: data }) {
     const rightX = Math.max(...allX);
 
     if (leftX !== rightX) {
+      // Small dot at the junction point
+      elements.push(
+        <circle
+          key={`junction-${coupleKey}`}
+          cx={dropX}
+          cy={barY}
+          r="3"
+          fill={lineColor}
+          opacity="0.7"
+        />
+      );
+
       elements.push(
         <line
           key={`hbar-${coupleKey}`}
@@ -517,7 +517,7 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear, isFull
             <TransformComponent wrapperClass="!w-full !h-full pointer-events-none" contentClass="!min-w-fit align-top">
               <div
                 ref={containerRef}
-                className="relative flex flex-col items-center gap-10 sm:gap-14 md:gap-16 py-8 sm:py-12 px-6 md:px-16 mx-auto pointer-events-auto cursor-grab active:cursor-grabbing pb-24 md:pb-32"
+                className="relative flex flex-col items-center gap-2 sm:gap-6 md:gap-8 py-8 sm:py-12 px-6 md:px-16 mx-auto pointer-events-auto cursor-grab active:cursor-grabbing pb-24 md:pb-32"
               >
                 {/* Connection Lines */}
                 {!activeGen && (
@@ -544,7 +544,7 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear, isFull
         ) : (
           <div
             ref={containerRef}
-            className="relative flex flex-col items-center gap-10 sm:gap-14 md:gap-16 py-4 sm:py-6 px-4 md:px-12 mx-auto min-w-fit"
+            className="relative flex flex-col items-center gap-2 sm:gap-6 md:gap-8 py-4 sm:py-6 px-4 md:px-12 mx-auto min-w-fit"
           >
             {/* Connection Lines */}
             {!activeGen && (
