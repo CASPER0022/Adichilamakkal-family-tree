@@ -342,6 +342,7 @@ const familyData = [
     avatar: getAvatar('Soniya', 'female'),
     bio: 'Daughter of Babu and Shiny.',
     spouseId: 'g4_sobin',
+    isExtended: true,
   },
   {
     id: 'g4_sobin',
@@ -354,6 +355,7 @@ const familyData = [
     avatar: getAvatar('Sobin', 'male'),
     bio: 'Husband of Soniya.',
     spouseId: 'g4_soniya',
+    isExtended: true,
   },
   {
     id: 'g4_sophia',
@@ -366,6 +368,7 @@ const familyData = [
     parentId: 'g3_babu',
     avatar: getAvatar('Sophia', 'female'),
     bio: 'Daughter of Babu and Shiny.',
+    isExtended: true,
   },
   {
     id: 'g4_sebin_sunny',
@@ -378,6 +381,7 @@ const familyData = [
     parentId: 'g3_shija',
     avatar: getAvatar('SebinSunny', 'male'),
     bio: 'Son of Shija and Sunny.',
+    isExtended: true,
   },
   {
     id: 'g4_sherin_sunny',
@@ -391,6 +395,7 @@ const familyData = [
     avatar: getAvatar('SherinSunny', 'female'),
     bio: 'Daughter of Shija and Sunny.',
     spouseId: 'g4_jofin',
+    isExtended: true,
   },
   {
     id: 'g4_jofin',
@@ -403,6 +408,7 @@ const familyData = [
     avatar: getAvatar('Jofin', 'male'),
     bio: 'Husband of Sherin.',
     spouseId: 'g4_sherin_sunny',
+    isExtended: true,
   },
 
   // ================= GENERATION 5 =================
@@ -429,6 +435,7 @@ const familyData = [
     parentId: 'g4_soniya',
     avatar: getAvatar('Name', 'female'),
     bio: 'Daughter of Soniya and Sobin.',
+    isExtended: true,
   },
   {
     id: 'g5_ruth',
@@ -441,6 +448,7 @@ const familyData = [
     parentId: 'g4_sherin_sunny',
     avatar: getAvatar('Ruth', 'female'),
     bio: 'Daughter of Sherin and Jofin.',
+    isExtended: true,
   },
 ];
 

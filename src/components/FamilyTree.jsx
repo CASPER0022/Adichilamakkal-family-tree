@@ -62,15 +62,17 @@ function ConnectionLines({ positions, familyData: data }) {
     if (childPositions.length === 0) return;
 
     const parentMember = data.find(m => m.id === group.parentId);
-    const isExtendedLine = parentMember?.isExtended;
-    const lineColor = isExtendedLine ? "#a855f7" : "#a3e635";
+    // Explicitly define the maternal branch for purple coloring (rather than overloading isExtended)
+    const maternalIds = ['g2_george', 'g2_annakutty', 'g3_shaji_vj', 'g3_betty_shaji', 'g3_reji_vj', 'g3_jeena_reji', 'g3_saju_vj', 'g4_alphonsa', 'g4_ann', 'g4_melbin', 'g4_godwin'];
+    const isMaternalLine = parentMember && maternalIds.includes(parentMember.id);
+    const lineColor = isMaternalLine ? "#a855f7" : "#a3e635";
 
     // Find the horizontal bar Y position (midway between parent bottom and first child top)
     const firstChildTop = Math.min(...childPositions.map((p) => p.top));
     let barY = dropY + (firstChildTop - dropY) * 0.5;
 
-    // Offset the horizontal bar for extended family lineages to prevent overlapping
-    if (isExtendedLine) {
+    // Offset the horizontal bar for extended family lineages to prevent overlapping (except single-child straight drops)
+    if (parentMember?.isExtended && childPositions.length > 1) {
       barY += 16;
     }
 
@@ -101,8 +103,18 @@ function ConnectionLines({ positions, familyData: data }) {
       />
     );
 
+    // If single child, enforce a perfectly straight vertical line ONLY if they are reasonably close (ignoring sub-pixel shifts)
+    // If they are physically far away due to flex layouts (like Gen 4), we MUST allow the horizontal connector to span the distance!
+    const activeChildPositions = childPositions.map(p => {
+      const isSubpixelShift = Math.abs(p.cx - dropX) < 20;
+      return {
+        ...p,
+        cx: childPositions.length === 1 && isSubpixelShift ? dropX : p.cx 
+      };
+    });
+
     // 2. Horizontal bar spanning across parent drop line AND all children
-    const allX = [dropX, ...childPositions.map((p) => p.cx)];
+    const allX = [dropX, ...activeChildPositions.map((p) => p.cx)];
     const leftX = Math.min(...allX);
     const rightX = Math.max(...allX);
 
@@ -123,7 +135,7 @@ function ConnectionLines({ positions, familyData: data }) {
     }
 
     // 3. Vertical lines from horizontal bar DOWN to each child
-    childPositions.forEach((childPos, idx) => {
+    activeChildPositions.forEach((childPos, idx) => {
       elements.push(
         <line
           key={`vchild-${coupleKey}-${idx}`}
@@ -255,7 +267,10 @@ function GenerationRow({ generation, couples, parentCouples, allData, selectedId
                 /* Couple-width wrapper: invisible padding cards force correct width, child centered between */
                 return (
                   <div key={`gen5-slot-${pci}`} className="flex items-start gap-4 sm:gap-8 md:gap-10 justify-center relative">
-                    <div className="w-28 sm:w-36 md:w-40 flex-shrink-0 invisible" />
+                    <div className="w-[72px] sm:w-[110px] md:w-[130px] flex-shrink-0 invisible pointer-events-none">
+                      {/* Invisible clone purely to provide physical height to the wrapper since the real child is absolute */}
+                      {childMembers[0] && <MemberCard member={childMembers[0]} index={0} />}
+                    </div>
                     {childMembers.map((child) => (
                       <div
                         key={child.id}
@@ -270,7 +285,7 @@ function GenerationRow({ generation, couples, parentCouples, allData, selectedId
                         />
                       </div>
                     ))}
-                    <div className="w-28 sm:w-36 md:w-40 flex-shrink-0 invisible" />
+                    <div className="w-[72px] sm:w-[110px] md:w-[130px] flex-shrink-0 invisible pointer-events-none" />
                   </div>
                 );
               } else {
@@ -294,7 +309,10 @@ function GenerationRow({ generation, couples, parentCouples, allData, selectedId
               return (
                 <div key={`gen5-empty-${pci}`} className="flex items-start gap-4 sm:gap-8 md:gap-10 relative">
                   {parentCouple.map(m => (
-                    <div key={`ph-${m.id}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 invisible" />
+                    <div key={`ph-${m.id}`} className="w-[72px] sm:w-[110px] md:w-[130px] flex-shrink-0 invisible pointer-events-none">
+                      {/* Invisible clone to maintain consistent physical height matching other slots */}
+                      <MemberCard member={m} index={0} />
+                    </div>
                   ))}
                 </div>
               );
@@ -308,7 +326,7 @@ function GenerationRow({ generation, couples, parentCouples, allData, selectedId
               {/* Gen 3 Spacers */}
               {isFullView && generation === 3 && ci === 4 && (
                 Array.from({ length: 1 }).map((_, i) => (
-                  <div key={`spacer-gen3-${i}`} className="w-28 sm:w-36 md:w-40 flex-shrink-0 pointer-events-none opacity-0" />
+                  <div key={`spacer-gen3-${i}`} className="w-[72px] sm:w-[110px] md:w-[130px] flex-shrink-0 pointer-events-none opacity-0" />
                 ))
               )}
 
