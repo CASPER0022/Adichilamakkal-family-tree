@@ -71,9 +71,15 @@ function ConnectionLines({ positions, familyData: data }) {
     const firstChildTop = Math.min(...childPositions.map((p) => p.top));
     let barY = dropY + (firstChildTop - dropY) * 0.5;
 
-    // Offset the horizontal bar for extended family lineages to prevent overlapping (except single-child straight drops)
+    // Offset the horizontal bar to prevent overlapping when multiple families merge into the same generation (e.g., George vs John)
+    if (isMaternalLine) {
+      barY -= 6;
+    } else {
+      barY += 6;
+    }
+
     if (parentMember?.isExtended && childPositions.length > 1) {
-      barY += 16;
+      barY += 12;
     }
 
     // 1. Vertical line: from parent couple center DOWN to the horizontal bar
@@ -517,7 +523,7 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear, isFull
             <TransformComponent wrapperClass="!w-full !h-full pointer-events-none" contentClass="!min-w-fit align-top">
               <div
                 ref={containerRef}
-                className="relative flex flex-col items-center gap-2 sm:gap-6 md:gap-8 py-8 sm:py-12 px-6 md:px-16 mx-auto pointer-events-auto cursor-grab active:cursor-grabbing pb-24 md:pb-32"
+                className="relative flex flex-col items-center gap-8 sm:gap-12 md:gap-16 py-8 sm:py-12 px-6 md:px-16 mx-auto pointer-events-auto cursor-grab active:cursor-grabbing pb-24 md:pb-32"
               >
                 {/* Connection Lines */}
                 {!activeGen && (
@@ -544,7 +550,7 @@ export default function FamilyTree({ highlightMemberId, onHighlightClear, isFull
         ) : (
           <div
             ref={containerRef}
-            className="relative flex flex-col items-center gap-2 sm:gap-6 md:gap-8 py-4 sm:py-6 px-4 md:px-12 mx-auto min-w-fit"
+            className="relative flex flex-col items-center gap-8 sm:gap-12 md:gap-16 py-4 sm:py-6 px-4 md:px-12 mx-auto min-w-fit"
           >
             {/* Connection Lines */}
             {!activeGen && (
